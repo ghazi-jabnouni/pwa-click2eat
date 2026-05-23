@@ -14,7 +14,8 @@ const transformFoodItem = (backendItem: BackendFoodItem): FoodItem => {
   if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.match(/^[\u1F600-\u1F64F]/)) {
     // If it's a relative path or just a filename
     const prefix = imageUrl.startsWith('/') ? '' : '/uploads/dishes/';
-    fullImageUrl = `http://localhost:5000${prefix}${imageUrl}`;
+    const imageBase = import.meta.env.VITE_IMAGE_BASE_URL;
+    fullImageUrl = `${imageBase}${prefix}${imageUrl}`;
   } else if (!imageUrl || imageUrl === '🍽️' || imageUrl === '🍔' || imageUrl === '🍕' || imageUrl === '🥗' || imageUrl === '🍗' || imageUrl === '🍝' || imageUrl === '🍟' || imageUrl === '🍨' || imageUrl === '☕') {
     // Premium placeholder images based on item name as fallback
     const searchQuery = encodeURIComponent(backendItem.item_name || 'food');
