@@ -14,7 +14,8 @@ function App() {
   const cart = useCart();
   const [initializing, setInitializing] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const isPrettyUrl = window.location.pathname.includes('/org/');
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const isPrettyUrl = window.location.pathname.includes('/org/') || pathSegments.length >= 4;
     return !!urlParams.get('service_id') || isPrettyUrl;
   });
   const [notification, setNotification] = useState<{message: string, id: number} | null>(null);
@@ -73,14 +74,20 @@ function App() {
       const areaIdFromParams = urlParams.get('area_id');
 
       // Check for pretty URL format: /org/:orgSlug/:serviceSlug/:areaSlug/:tableId
+      // Or: /:orgSlug/:serviceSlug/:areaSlug/:tableId
       const pathParts = window.location.pathname.split('/');
       let tableIdFromPath = null;
       let orgSlugFromPath = null;
       let serviceSlugFromPath = null;
+      
       if (pathParts.length >= 6 && pathParts[1] === 'org') {
         orgSlugFromPath = decodeURIComponent(pathParts[2]);
         serviceSlugFromPath = decodeURIComponent(pathParts[3]);
         tableIdFromPath = pathParts[5];
+      } else if (pathParts.length >= 5 && pathParts[1] !== 'cart' && pathParts[1] !== 'orders' && pathParts[1] !== 'profile') {
+        orgSlugFromPath = decodeURIComponent(pathParts[1]);
+        serviceSlugFromPath = decodeURIComponent(pathParts[2]);
+        tableIdFromPath = pathParts[4];
       }
 
       const effectiveServiceId = (serviceIdFromParams && !isNaN(parseInt(serviceIdFromParams))) ? parseInt(serviceIdFromParams) : undefined;
@@ -146,6 +153,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MenuPage cart={cart} />} />
           <Route path="/org/:orgSlug/:serviceSlug/:areaSlug/:tableId" element={<MenuPage cart={cart} />} />
+          <Route path="/:orgSlug/:serviceSlug/:areaSlug/:tableId" element={<MenuPage cart={cart} />} />
           <Route path="/cart" element={<CartPage cart={cart} />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/profile" element={<ProfilePage cart={cart} />} />
