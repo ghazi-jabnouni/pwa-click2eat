@@ -57,5 +57,6 @@ jobs:
 
             docker run -d \
               --name pwa \
+              -v /opt/.env:/app/.env \
               -p 5174:5173 \
               docker.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
